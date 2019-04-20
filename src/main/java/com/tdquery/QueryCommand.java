@@ -57,9 +57,13 @@ public class QueryCommand extends Command{
 		return this.limit;
 	}
 
+	public String getEngine() {
+		return this.engine;
+	}
+
 	@Override
 	protected void validate() {
-		if (!Objects.isNull(this.minTime) && !Objects.isNull(this.maxTime)) {
+		if (this.minTime > 0 && this.maxTime > 0) {
 			if (this.minTime > this.maxTime) {
 				throw new ParseException("max time must be greater than min time");
 			}
