@@ -1,4 +1,4 @@
-package com.tdquery;
+package com.tdquery.exception;
 
 public class QueryProcessingException extends Exception {
 

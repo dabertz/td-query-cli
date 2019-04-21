@@ -1,5 +1,9 @@
 package com.tdquery;
 
+import com.tdquery.exception.CommandException;
+import com.tdquery.exception.OutputProcessingException;
+import com.tdquery.exception.QueryProcessingException;
+
 public class AppRunner {
 
 	public AppRunner() {
@@ -7,9 +11,9 @@ public class AppRunner {
 
 	public static void main(String[] args) {
 
-		QueryCommand command = new QueryCommand();
-
 		try {
+
+			QueryCommand command = new QueryCommand();
 			command.parse(args);
 
 			QueryBuilder query = new QueryBuilder();
@@ -32,7 +36,7 @@ public class AppRunner {
 				System.out.println("No Results Found");
 			}
 			System.exit(0);
-		} catch(InvalidCommandException e) {
+		} catch(CommandException e) {
 			System.out.println(e.getMessage());
 			System.exit(1);
 		} catch (QueryProcessingException e) {

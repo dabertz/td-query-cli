@@ -46,7 +46,7 @@ public class QueryBuilder {
 	}
 
 	public String[] getColumnNames() {
-		if(this.columns.trim().isEmpty()) {
+		if(this.columns == null || this.columns.trim().isEmpty()) {
 			return new String[0];
 		}
 		return this.columns.split("\\s*,\\s*");
@@ -59,8 +59,9 @@ public class QueryBuilder {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		String columns = (this.columns != null && !this.columns.isEmpty()) ? this.columns.replaceAll("\'","") : "*";
-		sb.append(String.format("SELECT %s FROM %s ", columns, this.tablename));
+		String[] columnNames = this.getColumnNames();
+		String columns = (columnNames.length > 0) ? String.join(",", columnNames) : "*";
+		sb.append(String.format("SELECT %s FROM %s", columns, this.tablename));
 
 		List<String> conditions = new ArrayList<String>();				
 

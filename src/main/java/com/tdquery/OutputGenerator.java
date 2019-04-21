@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.msgpack.value.ArrayValue;
 
+import com.tdquery.exception.OutputProcessingException;
+
 import dnl.utils.text.table.TextTable;
 
 public class OutputGenerator {

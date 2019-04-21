@@ -1,9 +1,16 @@
 package com.tdquery;
 
 import com.tdquery.Command.CommandInfo;
+import com.tdquery.exception.CommandException;
+import com.tdquery.exception.MinGreaterMaxInputException;
+import com.tdquery.exception.MinimumUnixTimestampException;
 
-@CommandInfo(name = "Query", description = "CLI tool to issue a query on Treasure Data\n") 
+@CommandInfo(name = "Query", description = "CLI tool to issue a query on Treasure Data.\n") 
 public class QueryCommand extends Command{
+
+	public QueryCommand() throws CommandException {
+		super();
+	}
 
 	@Argument(index=0, description = "Database name", required = true)
 	private String databasename = null;
@@ -48,11 +55,11 @@ public class QueryCommand extends Command{
 		return this.columns; 
 	}
 
-	public Long getMinTime() {
+	public long getMinTime() {
 		return this.minTime; 
 	}
 
-	public Long getMaxTime() {
+	public long getMaxTime() {
 		return this.maxTime; 
 	}
 	
@@ -71,16 +78,25 @@ public class QueryCommand extends Command{
 	public String getPath() {
 		return this.format;
 	}
-	
+
 	public String getApiKey() {
 		return this.apiKey;
 	}
 
 	@Override
-	protected void validate() {
+	protected void validate() throws CommandException {
+
+		if(this.minTime > 0 && this.minTime < MINIMUM_UNIX_TIMESTAMP) {
+			throw new MinimumUnixTimestampException("min time must be greater than defined minimum unix timestamp"); 
+		}
+
+		if(this.maxTime > 0 && this.maxTime < MINIMUM_UNIX_TIMESTAMP) {
+			throw new MinimumUnixTimestampException("max time must be greater than defined minimum unix timestamp"); 
+		}
+
 		if (this.minTime > 0 && this.maxTime > 0) {
 			if (this.minTime > this.maxTime) {
-				throw new InvalidCommandException("max time must be greater than min time");
+				throw new MinGreaterMaxInputException("max time must be greater than min time");
 			}
 		}
 	}

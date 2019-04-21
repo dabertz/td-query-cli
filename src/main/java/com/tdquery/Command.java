@@ -12,19 +12,29 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.tdquery.exception.CommandException;
+import com.tdquery.exception.InvalidValueSectionException;
+import com.tdquery.exception.ParseOptionValueException;
+import com.tdquery.exception.RequiredArgumentException;
+
+/**
+ * Command Class - Command line parser
+ */
 public abstract class Command {
 	
 	private static final String LONG = "--";
 	private static final String SHORT = "-";
-	static final String NEWLINE = "\n";
+	private static final String NEWLINE = "\n";
+	protected static final long MINIMUM_UNIX_TIMESTAMP = 43200;
 
 	Map<String, FieldOptionType> fieldOptionMap;
 	Map<Integer, FieldArgumentType> fieldArgumentMap;
 
 	/**
 	 * Construct a Command Instance. Find the fields with Option and Argument annotations. 
+	 * @throws CommandException 
 	 */
-	public Command() {
+	public Command() throws CommandException {
 		Class<?> cls = this.getClass();
 		fieldOptionMap = new HashMap<String, FieldOptionType>();
 		fieldArgumentMap = new HashMap<Integer, FieldArgumentType>();
@@ -35,7 +45,7 @@ public abstract class Command {
 				if(argument != null) {
 					int idx = argument.index();
 					if(fieldArgumentMap.containsKey(idx)) {
-						throw new InvalidCommandException(String.format("Argument index [%d] found in [%s] and [%s] ", idx, fieldArgumentMap.get(idx), field));
+						throw new CommandException(String.format("Argument index [%d] found in [%s] and [%s] ", idx, fieldArgumentMap.get(idx), field));
 					}
 
 					FieldArgumentType fieldArgumentType = new FieldArgumentType(field, argument);
@@ -49,7 +59,7 @@ public abstract class Command {
 					FieldOptionType fieldOption = new FieldOptionType(field,option);
 					for(String key: keys) {
 						if(fieldOptionMap.containsKey(key)) {
-							throw new InvalidCommandException(String.format("Option [%s] found in [%s] and [%s] ", key, fieldOptionMap.get(key).field, field));
+							throw new CommandException(String.format("Option [%s] found in [%s] and [%s] ", key, fieldOptionMap.get(key).field, field));
 						}
 
 						fieldOptionMap.put(key, fieldOption);
@@ -65,7 +75,7 @@ public abstract class Command {
 	 * 
 	 * @param args Input arguments
 	 */
-	public void parse(String[] args) {
+	public void parse(String[] args) throws CommandException{
 
 		List<String> params = new ArrayList<String>();
 		ListIterator<String> list = Arrays.asList(args).listIterator();
@@ -89,7 +99,7 @@ public abstract class Command {
 		validate();
 	}
 
-	protected abstract void validate();
+	protected abstract void validate() throws CommandException;
 	
 	/**
 	 * Annotate the {@link CommandInfo} fields with Option
@@ -128,14 +138,14 @@ public abstract class Command {
 		String description();
 	}
 	
-	private void parseOption(String key, ListIterator<String> list) {
+	private void parseOption(String key, ListIterator<String> list) throws CommandException{
 		FieldOptionType fieldOption = fieldOptionMap.get(key);
 		if(fieldOption == null) {
-			throw new InvalidCommandException(String.format("Unknow option [%s]", key));
+			throw new CommandException(String.format("Unknown option [%s]", key));
 		}
-		
+
 		if(!list.hasNext()) {
-			throw new InvalidCommandException(String.format("Value must be defined for option [%s]", key));
+			throw new CommandException(String.format("Value must be defined for option [%s]", key));
 		}
 
 		Field field = fieldOption.field;
@@ -148,7 +158,7 @@ public abstract class Command {
 		String[] options = option.options();
 		if(options.length > 0) {
 			if (!Arrays.asList(options).contains(rawValue)) {
-				throw new InvalidCommandException(String.format("Invalid value for option [%s]. Posible options [%s]", key, String.join(",", options)));
+				throw new InvalidValueSectionException(String.format("Invalid value for option [%s]. Posible options [%s]", key, String.join(",", options)));
 			}
 		}
 
@@ -156,20 +166,20 @@ public abstract class Command {
 		try {			
 			value = parseValue(fieldType, rawValue);
 		} catch (Exception e) {
-			throw new InvalidCommandException(String.format("Error parsing value for option [%s]", field.getName()));
+			throw new ParseOptionValueException(String.format("Error parsing value for option [%s]", field.getName()),field.getName());
 		}
 
 		try {
 			field.set(this, value);
 		} catch (IllegalArgumentException e) {
-			throw new InvalidCommandException(String.format("Error setting the value for option [%s]", field.getName()), e);
+			throw new CommandException(String.format("Error setting the value for option [%s]", field.getName()), e);
 		} catch (IllegalAccessException e) {
-			throw new InvalidCommandException(String.format("Error setting value for option [%s]", field.getName()), e);
+			throw new CommandException(String.format("Error setting value for option [%s]", field.getName()), e);
 		}
 		
 	}
 
-	private void parseArguments(List<String> params) {
+	private void parseArguments(List<String> params) throws CommandException {
 		for(Map.Entry<Integer, FieldArgumentType> entry: fieldArgumentMap.entrySet()) {
 			String rawValue = null;
 			try {
@@ -182,7 +192,7 @@ public abstract class Command {
 			Argument annotation = fieldArgument.argument;
 			Class<?> type = field.getType();
 			if(annotation.required() && rawValue == null) {
-				throw new InvalidCommandException(String.format("Argument [%s] must be define in the command line", field.getName()));	
+				throw new RequiredArgumentException(String.format("Argument [%s] must be define in the command line", field.getName()), field.getName());	
 			}
 
 			if (rawValue != null) {
@@ -190,15 +200,15 @@ public abstract class Command {
 				try {
 					value = parseValue(type, rawValue);
 				} catch (Exception e) {
-					throw new InvalidCommandException(String.format("Error parsing value for argument [%s]", field.getName()));
+					throw new CommandException(String.format("Error parsing value for argument [%s]", field.getName()));
 				}
 
 				try {
 					field.set(this, value);
 				} catch (IllegalArgumentException e) {
-					throw new InvalidCommandException(String.format("Error setting the value for option [%s]", field.getName()), e);
+					throw new CommandException(String.format("Error setting the value for option [%s]", field.getName()), e);
 				} catch (IllegalAccessException e) {
-					throw new InvalidCommandException(String.format("Error setting value for option [%s]", field.getName()), e);
+					throw new CommandException(String.format("Error setting value for option [%s]", field.getName()), e);
 				}
 			}
 		}

@@ -13,6 +13,7 @@ import org.msgpack.value.ArrayValue;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.tdquery.exception.QueryProcessingException;
 import com.treasuredata.client.ExponentialBackOff;
 import com.treasuredata.client.TDClient;
 import com.treasuredata.client.model.TDColumn;
