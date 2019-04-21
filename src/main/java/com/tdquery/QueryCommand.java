@@ -2,7 +2,7 @@ package com.tdquery;
 
 import com.tdquery.Command.CommandInfo;
 
-@CommandInfo(name = "Query", description = "CLI tool to issue a query on Treasure Data") 
+@CommandInfo(name = "Query", description = "CLI tool to issue a query on Treasure Data\n") 
 public class QueryCommand extends Command{
 
 	@Argument(index=0, description = "Database name", required = true)

@@ -1,12 +1,9 @@
 package com.tdquery;
 
-import java.util.List;
-
-import com.treasuredata.client.TDClient;
-import com.treasuredata.client.model.TDDatabase;
-import com.treasuredata.client.model.TDTable;
-
 public class AppRunner {
+
+	public AppRunner() {
+	}
 
 	public static void main(String[] args) {
 
@@ -15,38 +12,39 @@ public class AppRunner {
 		try {
 			command.parse(args);
 
-		} catch(ParseException e) {
+			QueryBuilder query = new QueryBuilder();
+			query.setColumns(command.getColumns());
+			query.setTablename(command.getTableName());
+			query.setMinTime(command.getMinTime());
+			query.setMaxTime(command.getMaxTime());
+			query.setLimit(command.getLimit());
+
+			DataSource dataSource = new DataSource(command.getDatabaseName());
+			ResultSet result = dataSource.executeQuery(command.getEngine(), query);
+
+			System.out.println("======== RESULT =========");
+			if (result.getItems().size() > 0) {
+				OutputGenerator outputParser = new OutputGenerator(result, command.getFormat());
+				outputParser.generate(command.getPath());
+				System.out.println(String.format("Query: %s", query.toString()));
+				System.out.println(String.format("Total Item: %d", result.getItems().size()));
+			} else {
+				System.out.println("No Results Found");
+			}
+			System.exit(0);
+		} catch(InvalidCommandException e) {
+			System.out.println(e.getMessage());
+			System.exit(1);
+		} catch (QueryProcessingException e) {
+			System.out.println(e.getMessage());
+			System.exit(1);
+		} catch (OutputProcessingException e) {
+			System.out.print(e.getMessage());
+			System.exit(1);
+		} catch (Exception e) {
 			System.out.print(e.getMessage());
 			System.exit(1);
 		}
-
-		TDClient client = TDClient.newClient();
-		
-
-		try {
-			List<TDDatabase> databases = client.listDatabases();
-
-            TDDatabase db = databases.get(0);
-
-            System.out.println("database: " + db.getName());
-
-            for (TDTable table : client.listTables(db.getName())) {
-
-                System.out.println(" table: " + table);
-
-            }
-		}
-		catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
-
-        finally {
-
-            client.close();
-
-        }
 	}
 
 }

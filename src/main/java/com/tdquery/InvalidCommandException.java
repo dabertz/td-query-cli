@@ -1,17 +1,17 @@
 package com.tdquery;
 
-public class ParseException extends RuntimeException {
+public class InvalidCommandException extends RuntimeException {
 
 	/**
 	 * Auto generated
 	 */
 	private static final long serialVersionUID = -6768991471225646702L;
 
-	public ParseException(String message) {
+	public InvalidCommandException(String message) {
 		super(message);
 	}
 
-	public ParseException(String message, Throwable e) {
+	public InvalidCommandException(String message, Throwable e) {
 		super(message, e);
 	}
 }

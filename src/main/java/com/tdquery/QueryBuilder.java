@@ -42,10 +42,21 @@ public class QueryBuilder {
 		this.limit = limit;
 	}
 
+	public String[] getColumnNames() {
+		if(this.columns.trim().isEmpty()) {
+			return new String[0];
+		}
+		return this.columns.split("\\s*,\\s*");
+	}
+	
+	public String getTablename() {
+		return this.tablename;
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		String columns = this.columns != null ? this.columns.replaceAll("\'","") : "*";
+		String columns = (this.columns != null && !this.columns.isEmpty()) ? this.columns.replaceAll("\'","") : "*";
 		sb.append(String.format("SELECT %s FROM %s ", columns, this.tablename));
 
 		List<String> conditions = new ArrayList<String>();				
