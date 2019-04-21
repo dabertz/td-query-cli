@@ -16,10 +16,14 @@ public abstract class Command {
 	
 	private static final String LONG = "--";
 	private static final String SHORT = "-";
+	static final String NEWLINE = "\n";
 
 	Map<String, FieldOptionType> fieldOptionMap;
 	Map<Integer, FieldArgumentType> fieldArgumentMap;
 
+	/**
+	 * Construct a Command Instance. Find the fields with Option and Argument annotations. 
+	 */
 	public Command() {
 		Class<?> cls = this.getClass();
 		fieldOptionMap = new HashMap<String, FieldOptionType>();
@@ -55,7 +59,12 @@ public abstract class Command {
 			}
 		}
 	}
-	
+
+	/**
+	 * Parse the input arguments
+	 * 
+	 * @param args Input arguments
+	 */
 	public void parse(String[] args) {
 
 		List<String> params = new ArrayList<String>();
@@ -65,7 +74,8 @@ public abstract class Command {
 			String arg = list.next();
 
 			if (arg.equals("--help")) {
-				
+				displayHelp();
+				System.exit(0);
 			}
 
 			if (arg.startsWith(LONG) || arg.startsWith(SHORT)) {
@@ -82,8 +92,7 @@ public abstract class Command {
 	protected abstract void validate();
 	
 	/**
-	 * Annotate the {@link }
-	 * 
+	 * Annotate the {@link CommandInfo} fields with Option
 	 *
 	 */
 	@Target(ElementType.FIELD)
@@ -107,11 +116,10 @@ public abstract class Command {
 		String[] options() default {};
 		boolean required() default false;
 	}
-	
+
 	/**
-	 * Command the {@link }
+	 * Annotate a class as CommandInfo to use to display the command information
 	 * 
-	 *
 	 */
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
@@ -205,6 +213,42 @@ public abstract class Command {
 			return Long.decode(value);
 		}
 		return value;
+	}
+	
+	/**
+	 * Display the command information.
+	 */
+	public void displayHelp() {
+		StringBuilder sb = new StringBuilder();
+		
+		Class<?> cls = this.getClass();
+		
+		CommandInfo info = cls.getAnnotation(CommandInfo.class);
+		if (info != null) {
+			sb.append(info.description());
+			sb.append(NEWLINE);
+		}
+
+		sb.append("Options:");
+		sb.append(NEWLINE);
+		List<String> fieldNames = new ArrayList<String>();
+		for(Map.Entry<String,FieldOptionType> entry: this.fieldOptionMap.entrySet()) {
+			Field field = entry.getValue().field;
+
+			if(fieldNames.contains(field.getName())) {
+				continue;
+			}
+
+			Option option = entry.getValue().option;
+			String keys = String.join("/",option.keys());
+			String description = option.description();
+			sb.append(String.format("%-20s %s", keys, description));
+			sb.append(NEWLINE);
+
+			fieldNames.add(field.getName());
+		}
+
+		System.out.print(sb.toString());
 	}
 
 }
