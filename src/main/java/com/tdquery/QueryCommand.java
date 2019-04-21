@@ -1,12 +1,9 @@
 package com.tdquery;
 
-import java.util.Objects;
-
 import com.tdquery.Command.CommandInfo;
 
 @CommandInfo(name = "Query", description = "CLI tool to issue a query on Treasure Data") 
 public class QueryCommand extends Command{
-
 
 	@Argument(index=0, description = "Database name", required = true)
 	private String databasename = null;
@@ -24,15 +21,21 @@ public class QueryCommand extends Command{
 	@Option(keys= {"-M", "--MAX"}, description = "is optional and specifies the minimum timestamp: NULL by default")
 	private long maxTime;
 	
-	@Option(keys= {"-e", "--engine"}, description = "is optional and specifies the maximum timestamp: NULL by default")
+	@Option(keys= {"-e", "--engine"}, description = "is optional and specifies the query engine: ‘presto’ by default", options = {"hive","presto"})
 	private String engine = "presto";
 
-	@Option(keys= {"-f", "--format"}, description = "is optional and specifies the output format: tabular by default")
+	@Option(keys= {"-f", "--format"}, description = "is optional and specifies the output format: tabular by default", options = {"csv", "tabular"})
 	private String format = "tabular";
 
-	@Option(keys= {"-l", "--limit"}, description = "is optional and specifies the output format: tabular by default")
+	@Option(keys= {"-l", "--limit"}, description = "specifies the limit of records returned. Read all records if not specified.")
 	private int limit;
+
+	@Option(keys= {"-d", "--directory"}, description = "is optional and specifies the output directory: by default")
+	private String path = null;
 	
+	@Option(keys= {"-k", "--key"}, description = "is optional and specifies the output directory: by default")
+	private String apiKey = null;
+
 	public String getDatabaseName() {
 		return this.databasename; 
 	}
@@ -60,12 +63,24 @@ public class QueryCommand extends Command{
 	public String getEngine() {
 		return this.engine;
 	}
+	
+	public String getFormat() {
+		return this.format;
+	}
+
+	public String getPath() {
+		return this.format;
+	}
+	
+	public String getApiKey() {
+		return this.apiKey;
+	}
 
 	@Override
 	protected void validate() {
 		if (this.minTime > 0 && this.maxTime > 0) {
 			if (this.minTime > this.maxTime) {
-				throw new ParseException("max time must be greater than min time");
+				throw new InvalidCommandException("max time must be greater than min time");
 			}
 		}
 	}
