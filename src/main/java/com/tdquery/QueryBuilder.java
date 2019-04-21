@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * QueryBuilder construct the SELECT statement based on inputs. 
+ */
 public class QueryBuilder {
 	
 	private String columns;
