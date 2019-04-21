@@ -16,7 +16,7 @@ public abstract class Command {
 	
 	private static final String LONG = "--";
 	private static final String SHORT = "-";
-	
+
 	Map<String, FieldOptionType> fieldOptionMap;
 	Map<Integer, FieldArgumentType> fieldArgumentMap;
 
@@ -26,12 +26,12 @@ public abstract class Command {
 		fieldArgumentMap = new HashMap<Integer, FieldArgumentType>();
 		for (Field field: cls.getDeclaredFields()) {
 			if (!field.isSynthetic()) {
-				
+
 				Argument argument = field.getAnnotation(Argument.class);
 				if(argument != null) {
 					int idx = argument.index();
 					if(fieldArgumentMap.containsKey(idx)) {
-						throw new ParseException(String.format("Argument index [%d] found in [%s] and [%s] ", idx, fieldArgumentMap.get(idx), field));
+						throw new InvalidCommandException(String.format("Argument index [%d] found in [%s] and [%s] ", idx, fieldArgumentMap.get(idx), field));
 					}
 
 					FieldArgumentType fieldArgumentType = new FieldArgumentType(field, argument);
@@ -45,7 +45,7 @@ public abstract class Command {
 					FieldOptionType fieldOption = new FieldOptionType(field,option);
 					for(String key: keys) {
 						if(fieldOptionMap.containsKey(key)) {
-							throw new ParseException(String.format("Option [%s] found in [%s] and [%s] ", key, fieldOptionMap.get(key).field, field));
+							throw new InvalidCommandException(String.format("Option [%s] found in [%s] and [%s] ", key, fieldOptionMap.get(key).field, field));
 						}
 
 						fieldOptionMap.put(key, fieldOption);
@@ -54,7 +54,6 @@ public abstract class Command {
 
 			}
 		}
-		
 	}
 	
 	public void parse(String[] args) {
@@ -105,6 +104,7 @@ public abstract class Command {
 	public @interface Option {
 		String[] keys();
 		String description();
+		String[] options() default {};
 		boolean required() default false;
 	}
 	
@@ -123,30 +123,40 @@ public abstract class Command {
 	private void parseOption(String key, ListIterator<String> list) {
 		FieldOptionType fieldOption = fieldOptionMap.get(key);
 		if(fieldOption == null) {
-			throw new ParseException(String.format("Unknow option [%s]", key));
+			throw new InvalidCommandException(String.format("Unknow option [%s]", key));
 		}
 		
 		if(!list.hasNext()) {
-			throw new ParseException(String.format("Value must be defined for option [%s]", key));
+			throw new InvalidCommandException(String.format("Value must be defined for option [%s]", key));
 		}
 
 		Field field = fieldOption.field;
 		field.setAccessible(true);
 		Class<?> fieldType = field.getType();
-		
+
+		Option option = fieldOption.option;
+		String rawValue = list.next();
+
+		String[] options = option.options();
+		if(options.length > 0) {
+			if (!Arrays.asList(options).contains(rawValue)) {
+				throw new InvalidCommandException(String.format("Invalid value for option [%s]. Posible options [%s]", key, String.join(",", options)));
+			}
+		}
+
 		Object value;
-		try {
-			value = parseValue(fieldType, list.next());
+		try {			
+			value = parseValue(fieldType, rawValue);
 		} catch (Exception e) {
-			throw new ParseException(String.format("Error parsing value for option [%s]", field.getName()));
+			throw new InvalidCommandException(String.format("Error parsing value for option [%s]", field.getName()));
 		}
 
 		try {
 			field.set(this, value);
 		} catch (IllegalArgumentException e) {
-			throw new ParseException(String.format("Error setting the value for option [%s]", field.getName()), e);
+			throw new InvalidCommandException(String.format("Error setting the value for option [%s]", field.getName()), e);
 		} catch (IllegalAccessException e) {
-			throw new ParseException(String.format("Error setting value for option [%s]", field.getName()), e);
+			throw new InvalidCommandException(String.format("Error setting value for option [%s]", field.getName()), e);
 		}
 		
 	}
@@ -164,7 +174,7 @@ public abstract class Command {
 			Argument annotation = fieldArgument.argument;
 			Class<?> type = field.getType();
 			if(annotation.required() && rawValue == null) {
-				throw new ParseException(String.format("Argument [%s] must be define in the command line", field.getName()));	
+				throw new InvalidCommandException(String.format("Argument [%s] must be define in the command line", field.getName()));	
 			}
 
 			if (rawValue != null) {
@@ -172,15 +182,15 @@ public abstract class Command {
 				try {
 					value = parseValue(type, rawValue);
 				} catch (Exception e) {
-					throw new ParseException(String.format("Error parsing value for argument [%s]", field.getName()));
+					throw new InvalidCommandException(String.format("Error parsing value for argument [%s]", field.getName()));
 				}
 
 				try {
 					field.set(this, value);
 				} catch (IllegalArgumentException e) {
-					throw new ParseException(String.format("Error setting the value for option [%s]", field.getName()), e);
+					throw new InvalidCommandException(String.format("Error setting the value for option [%s]", field.getName()), e);
 				} catch (IllegalAccessException e) {
-					throw new ParseException(String.format("Error setting value for option [%s]", field.getName()), e);
+					throw new InvalidCommandException(String.format("Error setting value for option [%s]", field.getName()), e);
 				}
 			}
 		}
