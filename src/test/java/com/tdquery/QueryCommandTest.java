@@ -59,7 +59,7 @@ public class QueryCommandTest {
 
 	@Test
 	public void testAllInputCommand() {
-		// Test all options and required arguments
+		// Test all options
 
 		QueryCommand command = null;
 
