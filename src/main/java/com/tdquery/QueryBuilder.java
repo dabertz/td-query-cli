@@ -72,7 +72,7 @@ public class QueryBuilder {
 			if (this.minTime > 0) {
 				conditions.add(String.format("time > %d", this.minTime));
 			} else if (this.maxTime > 0) {
-				conditions.add(String.format("%d < time", this.maxTime));
+				conditions.add(String.format("time < %d", this.maxTime));
 			}
 		}
 
