@@ -11,11 +11,19 @@ public class AppRunner {
 
 	public static void main(String[] args) {
 
+		QueryCommand command = null;
+
 		try {
-
-			QueryCommand command = new QueryCommand();
+			command = new QueryCommand();
 			command.parse(args);
+		} catch(CommandException e) {
+			System.out.println(e.getMessage());
+			System.exit(1);
+		}
 
+		DataSource dataSource = null;
+		int status = 0;
+		try {
 			QueryBuilder query = new QueryBuilder();
 			query.setColumns(command.getColumns());
 			query.setTablename(command.getTableName());
@@ -23,7 +31,7 @@ public class AppRunner {
 			query.setMaxTime(command.getMaxTime());
 			query.setLimit(command.getLimit());
 
-			DataSource dataSource = new DataSource(command.getDatabaseName());
+			dataSource = new DataSource(command.getDatabaseName(), command.getApiKey());
 			ResultSet result = dataSource.executeQuery(command.getEngine(), query);
 
 			System.out.println("======== RESULT =========");
@@ -35,20 +43,14 @@ public class AppRunner {
 			} else {
 				System.out.println("No Results Found");
 			}
-			System.exit(0);
-		} catch(CommandException e) {
-			System.out.println(e.getMessage());
-			System.exit(1);
-		} catch (QueryProcessingException e) {
-			System.out.println(e.getMessage());
-			System.exit(1);
-		} catch (OutputProcessingException e) {
-			System.out.print(e.getMessage());
-			System.exit(1);
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
-			System.exit(1);
+			status = 1;
+		} finally {
+			dataSource.closeClientConnection();
 		}
+		
+		System.exit(status);
 	}
 
 }
