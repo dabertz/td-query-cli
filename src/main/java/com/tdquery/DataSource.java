@@ -24,7 +24,7 @@ import com.treasuredata.client.model.TDResultFormat;
 import com.treasuredata.client.model.TDTable;
 
 /**
- * Data Source connector to submit query/request on Treasure Data
+ * Data Source connector to establish Treasure Data client connection and submit query request.
  *
  */
 public class DataSource {
@@ -41,7 +41,11 @@ public class DataSource {
 
 	public DataSource(String dbname, String apiKey) {
 		this.dbname = dbname;
-		this.client = TDClient.newBuilder().setApiKey(apiKey).build();
+		if (apiKey != null) {
+			this.client = TDClient.newBuilder().setApiKey(apiKey).build();
+		} else {
+			this.client = TDClient.newClient();
+		}
 	}
 
 	public boolean testDb() {
@@ -59,13 +63,12 @@ public class DataSource {
 	public boolean existsTablename(String tablename) {
 		return this.client.existsTable(this.dbname, tablename);
 	}
-	
-	public String[] existsTableColumns(String columns) {
-		return null;
+
+	public void closeClientConnection() {
+		this.client.close();
 	}
 	
 	public boolean checkTableColumnsNonExistence(String columns) {
-		
 		return true;
 	}
 	
@@ -158,5 +161,4 @@ public class DataSource {
 
          return new ResultSet(schemaJSONArray, items);
 	}
-
 }
