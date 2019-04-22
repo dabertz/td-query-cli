@@ -12,6 +12,10 @@ import com.tdquery.exception.MinimumUnixTimestampException;
 import com.tdquery.exception.ParseOptionValueException;
 import com.tdquery.exception.RequiredArgumentException;
 
+/**
+ * Unit test for QueryCommand class
+ *
+ */
 public class QueryCommandTest {
 	
 	@Test
