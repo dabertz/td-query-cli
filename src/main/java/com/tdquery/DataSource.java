@@ -24,7 +24,7 @@ import com.treasuredata.client.model.TDResultFormat;
 import com.treasuredata.client.model.TDTable;
 
 /**
- * Data Source connector to establish Treasure Data client connection and submit query request.
+ * Data Source connector to establish Treasure Data client connection and submit query/job request.
  *
  */
 public class DataSource {
@@ -66,10 +66,6 @@ public class DataSource {
 
 	public void closeClientConnection() {
 		this.client.close();
-	}
-	
-	public boolean checkTableColumnsNonExistence(String columns) {
-		return true;
 	}
 	
 	public List<String> getTableColumnNames(String tablename) {
