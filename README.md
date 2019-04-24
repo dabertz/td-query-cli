@@ -60,6 +60,7 @@ Options:
 
 -d / --directory		is optional and specifies the output file directory: Out file will be stored in the user HOME directory by default
 -k / --key			is optional and specifies the TD API key: Key in $HOME/.td/td.conf or in the variable setting will be used by default
+--help				is optional to display all available commands.
 </pre>
 
 
