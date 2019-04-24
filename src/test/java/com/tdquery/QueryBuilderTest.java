@@ -16,6 +16,8 @@ public class QueryBuilderTest {
 
 	@Test
 	public void selectStatement() {
+		
+		// Check the defined arguments and options that should match with the expected SELECT statement
 		HashMap<String, String[]> map = new HashMap<String, String[]>(); 
 		map.put("SELECT * FROM my_table", new String[]{"my_database", "my_table"});
 		map.put("SELECT * FROM my_table LIMIT 200", new String[]{"my_database", "my_table", "-l", "200"});

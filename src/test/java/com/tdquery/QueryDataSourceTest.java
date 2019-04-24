@@ -13,6 +13,7 @@ import com.tdquery.exception.QueryProcessingException;
 
 /**
  * Unit test for submitting query/request to Treasure Data - Data Source
+ * Validate the data to ensure that the given column names and # of records match with the database table. 
  *
  */
 public class QueryDataSourceTest {

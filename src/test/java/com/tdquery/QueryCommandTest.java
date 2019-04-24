@@ -14,6 +14,7 @@ import com.tdquery.exception.RequiredArgumentException;
 
 /**
  * Unit test for QueryCommand class
+ * Validate the different inputs and values of the command options 
  *
  */
 public class QueryCommandTest {
