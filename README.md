@@ -100,7 +100,7 @@ $ mvn clean package -Dmaven.test.skip=true
 ```
 
 ## Library Dependencies
-Building single jar file using maven will bundled with the following libraries:
+Building single jar file using maven will be bundled with the following libraries:
 - [td-client](https://github.com/treasure-data/td-client-java)
 - [j-text-utils](https://code.google.com/archive/p/j-text-utils/)
 - [msgpack-java](https://github.com/msgpack/msgpack-java)
