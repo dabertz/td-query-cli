@@ -54,12 +54,12 @@ Options:
 -f / --format 			is optional and specifies the output format: tabular by default
 -c / --column 			is optional and specifies the comma separated list of columns to restrict the result to. Read all columns if not specified.
 -l / --limit 			is optional and specifies the limit of records returned. Read all records if not specified.
--m / --min 				is optional and specifies the minimum timestamp: NULL by default
--M / --MAX 				is optional and specifies the maximum timestamp: NULL by default
+-m / --min 			is optional and specifies the minimum timestamp: NULL by default
+-M / --MAX 			is optional and specifies the maximum timestamp: NULL by default
 -e / --engine 			is optional and specifies the query engine: ‘presto’ by default
 
 -d / --directory		is optional and specifies the output file directory: Out file will be stored in the user HOME directory by default
--k / --key				is optional and specifies the TD API key: Key in $HOME/.td/td.conf or in the variable setting will be used by default
+-k / --key			is optional and specifies the TD API key: Key in $HOME/.td/td.conf or in the variable setting will be used by default
 </pre>
 
 
