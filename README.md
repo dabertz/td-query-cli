@@ -93,6 +93,11 @@ Build single jar file with Maven
 $ mvn clean package
 ```
 
+To skip running unit tests 
+```
+$ mvn clean package -Dmaven.test.skip=true
+```
+
 ## Library Dependencies
 Building single jar file using maven will bundled with the following libraries:
 - [td-client](https://github.com/treasure-data/td-client-java)
@@ -100,7 +105,7 @@ Building single jar file using maven will bundled with the following libraries:
 - [msgpack-java](https://github.com/msgpack/msgpack-java)
 - [logback-classic](https://github.com/qos-ch/logback)
 
-They are included in the maven project file(pom.xml)
+These are included in the maven project file(pom.xml)
 
 ```
 <dependencies>
