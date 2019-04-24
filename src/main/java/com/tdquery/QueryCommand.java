@@ -5,6 +5,10 @@ import com.tdquery.exception.CommandException;
 import com.tdquery.exception.MinGreaterMaxInputException;
 import com.tdquery.exception.MinimumUnixTimestampException;
 
+/**
+ * QueryCommand class to set the fields for required arguments and options
+ *
+ */
 @CommandInfo(name = "Query", description = "CLI tool to issue a query on Treasure Data.\n") 
 public class QueryCommand extends Command{
 
@@ -12,10 +16,10 @@ public class QueryCommand extends Command{
 		super();
 	}
 
-	@Argument(index=0, description = "Database name", required = true)
+	@Argument(index=0, name="databasename", description = "Database name", required = true)
 	private String databasename = null;
 
-	@Argument(index=1, description = "Table name", required = true)
+	@Argument(index=1, name="tablename", description = "Table name", required = true)
 	private String tablename = null;
 
 	@Option(keys= {"-c", "--column"}, description = "is optional and specifies the comma separated list of columns to restrict the\n" + 
@@ -40,7 +44,7 @@ public class QueryCommand extends Command{
 	@Option(keys= {"-d", "--directory"}, description = "is optional and specifies the output directory: by default")
 	private String path = null;
 	
-	@Option(keys= {"-k", "--key"}, description = "is optional and specifies the output directory: by default")
+	@Option(keys= {"-k", "--key"}, description = "is optional and specifies the TD API key: Key in $HOME/.td/td.conf or in the variable setting will be used by default")
 	private String apiKey = null;
 
 	public String getDatabaseName() {
@@ -87,16 +91,16 @@ public class QueryCommand extends Command{
 	protected void validate() throws CommandException {
 
 		if(this.minTime > 0 && this.minTime < MINIMUM_UNIX_TIMESTAMP) {
-			throw new MinimumUnixTimestampException("min time must be greater than defined minimum unix timestamp"); 
+			throw new MinimumUnixTimestampException("(-m) min time must be greater than defined minimum unix timestamp"); 
 		}
 
 		if(this.maxTime > 0 && this.maxTime < MINIMUM_UNIX_TIMESTAMP) {
-			throw new MinimumUnixTimestampException("max time must be greater than defined minimum unix timestamp"); 
+			throw new MinimumUnixTimestampException("(-M) max time must be greater than defined minimum unix timestamp"); 
 		}
 
 		if (this.minTime > 0 && this.maxTime > 0) {
 			if (this.minTime > this.maxTime) {
-				throw new MinGreaterMaxInputException("max time must be greater than min time");
+				throw new MinGreaterMaxInputException("(-M)max time must be greater than (-m)min time");
 			}
 		}
 	}

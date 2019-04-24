@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.tdquery.exception.CommandException;
 import com.tdquery.exception.InvalidValueSectionException;
@@ -28,7 +29,7 @@ public abstract class Command {
 	protected static final long MINIMUM_UNIX_TIMESTAMP = 43200;
 
 	Map<String, FieldOptionType> fieldOptionMap;
-	Map<Integer, FieldArgumentType> fieldArgumentMap;
+	TreeMap<Integer, FieldArgumentType> fieldArgumentMap;
 
 	/**
 	 * Construct a Command Instance. Find the fields with Option and Argument annotations. 
@@ -37,7 +38,7 @@ public abstract class Command {
 	public Command() throws CommandException {
 		Class<?> cls = this.getClass();
 		fieldOptionMap = new HashMap<String, FieldOptionType>();
-		fieldArgumentMap = new HashMap<Integer, FieldArgumentType>();
+		fieldArgumentMap = new TreeMap<Integer, FieldArgumentType>();
 		for (Field field: cls.getDeclaredFields()) {
 			if (!field.isSynthetic()) {
 
@@ -110,6 +111,7 @@ public abstract class Command {
 	public @interface Argument {
 		int index();
 		String description();
+		String name();
 		boolean required() default false;
 	}
 
@@ -166,7 +168,7 @@ public abstract class Command {
 		try {			
 			value = parseValue(fieldType, rawValue);
 		} catch (Exception e) {
-			throw new ParseOptionValueException(String.format("Error parsing value for option [%s]", field.getName()),field.getName());
+			throw new ParseOptionValueException(String.format("Error parsing value for option [%s]", key),field.getName());
 		}
 
 		try {
@@ -192,7 +194,7 @@ public abstract class Command {
 			Argument annotation = fieldArgument.argument;
 			Class<?> type = field.getType();
 			if(annotation.required() && rawValue == null) {
-				throw new RequiredArgumentException(String.format("Argument [%s] must be define in the command line", field.getName()), field.getName());	
+				throw new RequiredArgumentException(String.format("Argument [%s] must be define in the command line", annotation.description()), field.getName());	
 			}
 
 			if (rawValue != null) {
@@ -200,20 +202,27 @@ public abstract class Command {
 				try {
 					value = parseValue(type, rawValue);
 				} catch (Exception e) {
-					throw new CommandException(String.format("Error parsing value for argument [%s]", field.getName()));
+					throw new CommandException(String.format("Error parsing value for argument [%s]", annotation.description()));
 				}
 
 				try {
 					field.set(this, value);
 				} catch (IllegalArgumentException e) {
-					throw new CommandException(String.format("Error setting the value for option [%s]", field.getName()), e);
+					throw new CommandException(String.format("Error setting the value for option [%s]", annotation.description()), e);
 				} catch (IllegalAccessException e) {
-					throw new CommandException(String.format("Error setting value for option [%s]", field.getName()), e);
+					throw new CommandException(String.format("Error setting value for option [%s]", annotation.description()), e);
 				}
 			}
 		}
 	}
-	
+
+	/**
+	 * Parse the given value for the parameter
+	 * 
+	 * @param type	Field type(e.g string, int, long)
+	 * @param value	Given value
+	 * @return	The parsed value. If invalid will throw parse exception
+	 */
 	private Object parseValue(Class<?> type, String value) {
 		if (type == String.class) {
 			return value;
@@ -227,6 +236,7 @@ public abstract class Command {
 	
 	/**
 	 * Display the command information.
+	 * 
 	 */
 	public void displayHelp() {
 		StringBuilder sb = new StringBuilder();
@@ -238,7 +248,16 @@ public abstract class Command {
 			sb.append(info.description());
 			sb.append(NEWLINE);
 		}
+		
+		sb.append("Arguments:");
+		sb.append(NEWLINE);
+		for(Map.Entry<Integer,FieldArgumentType> entry: this.fieldArgumentMap.entrySet()) {
+			Argument argument = entry.getValue().argument;
+			sb.append(argument.name());
+			sb.append(NEWLINE);
+		}
 
+		sb.append(NEWLINE);
 		sb.append("Options:");
 		sb.append(NEWLINE);
 		List<String> fieldNames = new ArrayList<String>();
@@ -258,7 +277,7 @@ public abstract class Command {
 			fieldNames.add(field.getName());
 		}
 
-		System.out.print(sb.toString());
+		System.out.println(sb.toString());
 	}
 
 }
