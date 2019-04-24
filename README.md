@@ -4,13 +4,13 @@ A java command line application to issue a query on Treasure Data and query a da
 Using this CLI tool allows user to specify the following options:
 - required: database name 'db_name'
 - required: table name 'table_name'
-- optional: comma separated list of columns ' col_list ' as string (e.g. 'column1,column2,column3 ’). If not specified, all columns are selected.
+- optional: comma separated list of columns 'col_list' as string (e.g. 'column1,column2,column3'). If not specified, all columns are selected.
 - optional: minimum timestamp 'min_time' in unix timestamp or 'NULL'
-- optional: maximum timestamp 'max_time' in unix timestamp or 'NULL' .
+- optional: maximum timestamp 'max_time' in unix timestamp or 'NULL'.
 (Obviously 'max_time' must be greater than 'min_time' or NULL.)
-- optional: query engine ‘ engine ’: ' hive ' or ' presto '. Defaults to ‘presto’.
-- optional: output format ‘ format ’: ‘ csv ’ or ‘ tabular '. Defaults to ‘tabular’.
-- optional: a query limit ‘ limit ’: ‘ 100 ’. If not specified, all records are selected.
+- optional: query engine 'engine': 'hive' or 'presto'. Defaults to 'presto'.
+- optional: output format 'format': 'csv' or 'tabular'. Defaults to 'tabular'.
+- optional: a query limit 'limit': '100'. If not specified, all records are selected.
 
 ## Download
 You can download the executable jar package(td-query-cli-0.0.1-SNAPSHOT-jar-with-dependencies.jar) bundled with dependencies from [here](https://drive.google.com/open?id=1OG4eZ7klazdtqU6aAAEV3j3HXtt0Sa_t) or [build](#build) from the source code.
@@ -56,7 +56,7 @@ Options:
 -l / --limit 			is optional and specifies the limit of records returned. Read all records if not specified.
 -m / --min 			is optional and specifies the minimum timestamp: NULL by default
 -M / --MAX 			is optional and specifies the maximum timestamp: NULL by default
--e / --engine 			is optional and specifies the query engine: ‘presto’ by default
+-e / --engine 			is optional and specifies the query engine: 'presto' by default
 
 -d / --directory		is optional and specifies the output file directory: Out file will be stored in the user HOME directory by default
 -k / --key			is optional and specifies the TD API key: Key in $HOME/.td/td.conf or in the variable setting will be used by default
