@@ -110,25 +110,25 @@ These are included in the maven project file(pom.xml)
 
 ```
 <dependencies>
-	<dependency>
-		<groupId>com.treasuredata.client</groupId>
-		<artifactId>td-client</artifactId>
-		<version>0.8.13</version>
-	</dependency>
-	<dependency>
-		<groupId>ch.qos.logback</groupId>
-		<artifactId>logback-classic</artifactId>
-		<version>1.2.3</version>
-	</dependency>
-  	<dependency>
-      <groupId>org.msgpack</groupId>
-      <artifactId>msgpack-core</artifactId>
-      <version>0.8.10</version>
+    <dependency>
+	<groupId>com.treasuredata.client</groupId>
+	<artifactId>td-client</artifactId>
+	<version>0.8.13</version>
     </dependency>
     <dependency>
-      <groupId>com.massisframework</groupId>
-      <artifactId>j-text-utils</artifactId>
-      <version>0.3.4</version>
+	<groupId>ch.qos.logback</groupId>
+	<artifactId>logback-classic</artifactId>
+	<version>1.2.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.msgpack</groupId>
+        <artifactId>msgpack-core</artifactId>
+        <version>0.8.10</version>
+    </dependency>
+    <dependency>
+        <groupId>com.massisframework</groupId>
+        <artifactId>j-text-utils</artifactId>
+        <version>0.3.4</version>
     </dependency>
 </dependencies>
 ```
